@@ -11,9 +11,11 @@ def featurize_row(row,w,i,j):
   r  = row.split(",",2)
   x  = scale(np.array(r[i].split(),dtype=np.float))
   y  = scale(np.array(r[j].split(),dtype=np.float))
-  b  = np.ones(x.shape)  
+  b  = np.ones(x.shape)
+  # equation (4), .mean(1) computes the empirical
   dx = np.cos(np.dot(w2,np.vstack((x,b)))).mean(1)
   dy = np.cos(np.dot(w2,np.vstack((y,b)))).mean(1)
+  # I don't understand why they do it this way--to break symmetry?
   if(sum(dx) > sum(dy)):
     return np.hstack((dx,dy,np.cos(np.dot(w,np.vstack((x,y,b)))).mean(1)))
   else:
@@ -34,13 +36,18 @@ def read_pairs(filename):
   return pairs
 
 k    = 100
-s    = 10
+s    = 10  # Gaussian kernel parameter
 
 np.random.seed(0);
+# Fourier Featurization
+# First half is Fourier featurization of Gaussian kernel with parameter s,
+# second half is 2pi*unif(0,1) to get the bs.
 w  = np.hstack((s*np.random.randn(k,2),2*np.pi*np.random.rand(k,1)))
 w2 = np.hstack((s*np.random.randn(k,1),2*np.pi*np.random.rand(k,1)))
+# Read data
 y = np.genfromtxt(PATH_Y_TR, delimiter=",")[:,1]
 x = read_pairs(PATH_X_TR)
+# Featurize with flip, i.e. reverse direction
 x = featurize(x,w,1)
 y = np.hstack((y,-y))
 
