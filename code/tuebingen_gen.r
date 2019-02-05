@@ -26,8 +26,8 @@ mechanism <- function(x,d=10) {
   function(z) predict(smooth.spline(g,rnorm(d)),z)$y
 }
 
-N  <- 10
-n <- 10
+N  <- 1000
+n <- 1000
 
 set.seed(0)
 

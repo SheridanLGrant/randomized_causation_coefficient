@@ -16,10 +16,12 @@ def featurize_row(row,w,i,j):
   dx = np.cos(np.dot(w2,np.vstack((x,b)))).mean(1)
   dy = np.cos(np.dot(w2,np.vstack((y,b)))).mean(1)
   # I don't understand why they do it this way--to break symmetry?
-  if(sum(dx) > sum(dy)):
-    return np.hstack((dx,dy,np.cos(np.dot(w,np.vstack((x,y,b)))).mean(1)))
-  else:
-    return np.hstack((dx,dy,np.cos(np.dot(w,np.vstack((y,x,b)))).mean(1)))
+  # It is apparently unnecessary
+#  if(sum(dx) > sum(dy)):
+#    return np.hstack((dx,dy,np.cos(np.dot(w,np.vstack((x,y,b)))).mean(1)))
+#  else:
+#    return np.hstack((dx,dy,np.cos(np.dot(w,np.vstack((y,x,b)))).mean(1)))
+  return np.hstack((dx,dy,np.cos(np.dot(w,np.vstack((x,y,b)))).mean(1)))
 
 def featurize(x,w,flip):
   f1  = np.array([featurize_row(row,w,1,2) for row in x])
