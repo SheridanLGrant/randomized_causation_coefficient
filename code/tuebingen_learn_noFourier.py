@@ -4,9 +4,7 @@ PATH_X_TE = "tuebingen_pairs.csv"
 PATH_Y_TE = "tuebingen_target.csv"
 
 import numpy as np
-from   sklearn.ensemble         import RandomForestClassifier as RFC
 from   sklearn.preprocessing    import scale
-from   sklearn.svm              import SVC
 
 import os
 os.chdir('C:/Users/Sheridongle/Documents/projects/randomized_causation_coefficient/code/')
@@ -77,15 +75,18 @@ def kernel_dist(p,q,weights=np.ones(3),gamma=10,kernel='gaussian'):
 def classify(test):
     return np.mean([kernel_dist(x[i],test)*y[i] for i in range(len(x))])
 
+
+num_tests = 10
+
+
 if __name__ == '__main__':
+    indices = np.random.choice(x_te.shape[0], num_tests, False)
     n_cores = multiprocessing.cpu_count()
     start = time.clock()
     with multiprocessing.Pool(n_cores-1) as P:
-        scores = P.map(classify,x_te[:10])
-    #scores = np.array([[kernel_dist(x[i],x_te[j])*y[i] for i in range(len(x))] for j in range(len(x_te))])
+        scores = np.array(P.map(classify, x_te[indices]))
     end = time.clock()
     print(end-start)
+    y_hats = 2*(scores > 0)-1
+    print('Accuracy:', np.mean(y_hats== y_te[indices]))
     
-    
-svm = SVC(kernel=lambda x,y:np.dot(x-y,x-y))
-svm.fit(x,y)

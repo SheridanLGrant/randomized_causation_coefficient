@@ -14,9 +14,9 @@ def featurize_row(row,w,i,j):
   b  = np.ones(x.shape)
   # equation (4), .mean(1) computes the empirical
   dx = np.cos(np.dot(w2,np.vstack((x,b)))).mean(1)
-  dy = np.cos(np.dot(w2,np.vstack((y,b)))).mean(1)
+  dy = np.cos(np.dot(w2,np.vstack((y,b)))).mean(1)  # Same w for x and y
   # I don't understand why they do it this way--to break symmetry?
-  # It is apparently unnecessary
+  # It is apparently unnecessary, DLP acknowledges.
 #  if(sum(dx) > sum(dy)):
 #    return np.hstack((dx,dy,np.cos(np.dot(w,np.vstack((x,y,b)))).mean(1)))
 #  else:
@@ -38,7 +38,7 @@ def read_pairs(filename):
   return pairs
 
 k    = 100
-s    = 10  # Gaussian kernel parameter
+s    = 10  # Gaussian kernel parameter, "gamma" in their paper
 
 np.random.seed(0);
 # Fourier Featurization
@@ -47,14 +47,14 @@ np.random.seed(0);
 w  = np.hstack((s*np.random.randn(k,2),2*np.pi*np.random.rand(k,1)))
 w2 = np.hstack((s*np.random.randn(k,1),2*np.pi*np.random.rand(k,1)))
 # Read data
-y = np.genfromtxt(PATH_Y_TR, delimiter=",")[:,1]
-x = read_pairs(PATH_X_TR)
+Y = np.genfromtxt(PATH_Y_TR, delimiter=",")[:,1]
+X = read_pairs(PATH_X_TR)
 # Featurize with flip, i.e. reverse direction
-x = featurize(x,w,1)
-y = np.hstack((y,-y))
+x = featurize(X,w,1)
+y = np.hstack((Y,-Y))
 
-reg = RFC(verbose=10,random_state=0, max_features=None,
-max_depth=None,min_samples_leaf=100, n_estimators=500, n_jobs=4).fit(x,y);
+reg = RFC(verbose=0,random_state=0, max_features=None,
+max_depth=None,min_samples_leaf=100, n_estimators=500, n_jobs=3).fit(x,y);
 
 x_te = read_pairs(PATH_X_TE)
 x_te = featurize(x_te,w,0)
